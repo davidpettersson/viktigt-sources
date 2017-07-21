@@ -7,6 +7,7 @@ import sys
 from subprocess import Popen, PIPE, DEVNULL
 
 import cap_api
+from place_lookup import lookup_polygon
 
 POST_URL='http://viktigt.vdrift.se/vicky/alerts'
 
@@ -53,6 +54,9 @@ if feed:
                     else:
                         area.remove(area_type)
 
+                    area_desc = area.find('cap:areaDesc', ns)
+                    polygon_to_add = lookup_polygon(area_desc.text)
+
                     # Order matters! Area is last!
                     info.remove(area)
                     info.append(area)
@@ -65,6 +69,12 @@ if feed:
                         polygon.text = data.text
                         polygon.remove(to_remove)
                         polygon.tag = 'cap:polygon'
+                        if len(polygon.text.split(' ')) == 1 and polygon_to_add:
+                            polygon.text = ' '.join(map(lambda e: '%s,%s' % tuple(e), polygon_to_add))
+                    else:
+                        if polygon_to_add:
+                            polygon = ET.SubElement(area, 'polygon')
+                            polygon.text = ' '.join(map(lambda e: '%s,%s' % tuple(e), polygon_to_add))
 
             # add data to array
             data = ET.tostring(alert, encoding='utf-8', method='xml').decode('utf-8')
