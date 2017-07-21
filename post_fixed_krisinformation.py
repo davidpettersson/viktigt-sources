@@ -42,9 +42,16 @@ if feed:
                 info.insert(list(info).index(headline), sender_name)
 
                 # area has no child named Type
-                for area in info.findall('cap:area', ns):
+                area_list = info.findall('cap:area', ns)
+                for area in area_list:
                     area_type = area.find('cap:Type', ns)
-                    area.remove(area_type)
+                    # Stating things like area 'Sweden' and then a county is not... 
+                    # really helpful.... Try to avoid plotting those.
+                    if area_type.text is 'Sovereign country' and len(area_list) > 1:
+                        info.remove(area)
+                        continue
+                    else:
+                        area.remove(area_type)
 
                     # Order matters! Area is last!
                     info.remove(area)
