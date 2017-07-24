@@ -14,21 +14,22 @@ def lookup_polygon(search_query):
         'Accept-Language': 'sv-SE',
     }
     rsp = requests.get(OSM_NOMINATIM_URL, params=params, headers=headers)
-    j = rsp.json()
+    if rsp.status_code == 200:
+        j = rsp.json()
 
-    if len(j) == 0:
-        return None
+        if len(j) == 0:
+            return None
 
-    if not 'polygonpoints' in j[0]:
-        return None
+        if not 'polygonpoints' in j[0]:
+            return None
 
-    if search_query in j[0]['display_name']:
-        return j[0]['polygonpoints']
+        if search_query in j[0]['display_name']:
+            return j[0]['polygonpoints']
     else:
         return None
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
-        lookup_polygon(sys.argv[1])
+        print(lookup_polygon(sys.argv[1]))
     else:
         print('usage: %s SEARCH_QUERY' % sys.argv[0])
