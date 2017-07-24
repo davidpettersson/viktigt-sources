@@ -195,7 +195,8 @@ except ImportError as exp:
                 if tzoff is not None:
                     total_seconds = tzoff.seconds + (86400 * tzoff.days)
                     if total_seconds == 0:
-                        _svalue += 'Z'
+                        #_svalue += 'Z'# Would break formatting that explicitly states that Z is not valid.
+                        _svalue += '+00:00'
                     else:
                         if total_seconds < 0:
                             _svalue += '-'
